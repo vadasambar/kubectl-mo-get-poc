@@ -1,34 +1,46 @@
 /*
-Copyright 2014 The Kubernetes Authors.
+Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
 */
-
 package main
 
 import (
-	"k8s.io/component-base/cli"
-	"k8s.io/kubectl/pkg/cmd"
-	"k8s.io/kubectl/pkg/cmd/util"
-
-	// Import to initialize client auth plugins.
-	_ "k8s.io/client-go/plugin/pkg/client/auth"
+	"bytes"
+	"fmt"
+	"os"
+	"os/exec"
 )
 
+var namespaces = []string{
+	"kube-system",
+	"suraj",
+}
+
 func main() {
-	command := cmd.NewDefaultKubectlCommand()
-	if err := cli.RunNoErrOutput(command); err != nil {
-		// Pretty-print the error and exit with an error.
-		util.CheckErr(err)
+	// command := cmd.NewDefaultKubectlCommand()
+	// if err := cli.RunNoErrOutput(command); err != nil {
+	// 	// Pretty-print the error and exit with an error.
+	// 	util.CheckErr(err)
+	// }
+
+	// cmd.Execute()
+
+	for _, n := range namespaces {
+		var stdout bytes.Buffer
+		var stderr bytes.Buffer
+		a := []string{}
+		a = append(a, "-n", n)
+		a = append(a, os.Args[2:]...)
+		fmt.Println("hello")
+		c := exec.Command("kubectl", a...)
+		fmt.Println("executed command", c.String())
+		c.Stderr = &stderr
+		c.Stdout = &stdout
+		if err := c.Run(); err != nil {
+			fmt.Println(stderr.String())
+			os.Exit(1)
+		}
+		fmt.Println("namespace:", n)
+		fmt.Println(stdout.String())
 	}
 }
