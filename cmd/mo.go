@@ -31,15 +31,48 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// fmt.Println("mo called")
 
+		// for _, n := range namespaces {
+		// 	var stdout bytes.Buffer
+		// 	var stderr bytes.Buffer
+		// 	a := []string{}
+		// 	a = append(a, os.Args[2:]...)
+		// 	// a = append(a, "-n", n)
+		// 	fmt.Println("hello")
+		// 	c := exec.Command("kubectl", a...)
+		// 	fmt.Println("c", c.String())
+		// 	c.Stderr = &stderr
+		// 	c.Stdout = &stdout
+		// 	if err := c.Run(); err != nil {
+		// 		fmt.Println(stderr.String())
+		// 		os.Exit(1)
+		// 	}
+		// 	fmt.Println("namespace:", n)
+		// 	fmt.Println(stdout.String())
+		// }
+
+		fmt.Println("args", args)
+		nn, err := cmd.Flags().GetStringSlice("nn")
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("nn", nn)
+		if err := cmd.Flags().Set("nn", ""); err != nil {
+			panic(err)
+		}
+		// cmd.Flags().Visit(func(f *pflag.Flag) {
+		// 	if f.Name == "nn" {
+		// 		f.Value.Set("")
+		// 	}
+		// })
+
 		for _, n := range namespaces {
 			var stdout bytes.Buffer
 			var stderr bytes.Buffer
 			a := []string{}
+			a = append(a, "-n", n)
 			a = append(a, os.Args[2:]...)
-			// a = append(a, "-n", n)
-			fmt.Println("hello")
 			c := exec.Command("kubectl", a...)
-			fmt.Println("c", c.String())
+			fmt.Println("executed command", c.String())
 			c.Stderr = &stderr
 			c.Stdout = &stdout
 			if err := c.Run(); err != nil {
@@ -65,4 +98,5 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// moCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	moCmd.Flags().StringSliceP("nn", "", []string{}, "Specify comma separated list of namespaces")
 }
