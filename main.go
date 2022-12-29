@@ -1,6 +1,5 @@
 /*
 Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-
 */
 package main
 
@@ -24,25 +23,17 @@ var namespaces = []string{
 // }
 
 func main() {
-	// command := cmd.NewDefaultKubectlCommand()
-	// if err := cli.RunNoErrOutput(command); err != nil {
-	// 	// Pretty-print the error and exit with an error.
-	// 	util.CheckErr(err)
-	// }
-
-	// cmd.Execute()
 	args := []string{}
-	for _, arg := range os.Args[2:] {
+	fmt.Println("os.Args", os.Args)
+	for _, arg := range os.Args[1:] {
 		if strings.Contains(arg, "--namespaces") {
 			a := strings.Replace(arg, "--namespaces=", "", 1)
 			for _, n := range strings.Split(a, ",") {
 				namespaces = append(namespaces, strings.TrimSpace(n))
 			}
-			args = append(args, "")
 			continue
 		}
-
-		args = append(args, arg)
+		args = append(args, strings.TrimSpace(arg))
 	}
 
 	for _, n := range namespaces {
@@ -52,7 +43,7 @@ func main() {
 		a = append(a, "-n", n)
 		a = append(a, args...)
 		c := exec.Command("kubectl", a...)
-		fmt.Println("executed command", c.String())
+		fmt.Println("executing command", c.String())
 		c.Stderr = &stderr
 		c.Stdout = &stdout
 
@@ -63,7 +54,5 @@ func main() {
 			continue
 		}
 		fmt.Println(stdout.String())
-
-		fmt.Println("namespace:", n)
 	}
 }
